@@ -1,0 +1,20 @@
+{
+  "name": "win-log-analyzer",
+  "version": "0.1.0",
+  "description": "Windows Event Log analyzer powered by Claude API",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "fetch-logs": "tsx src/fetch-logs.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
