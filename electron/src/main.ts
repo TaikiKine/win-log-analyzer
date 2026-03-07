@@ -1,7 +1,7 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, dialog } from "electron";
 import path from "node:path";
+import { startServer, stopServer } from "./server-process";
 
-// パッケージ化されていない = 開発モード
 const isDev = !app.isPackaged;
 
 function createWindow(): BrowserWindow {
@@ -16,19 +16,30 @@ function createWindow(): BrowserWindow {
   });
 
   if (isDev) {
-    // Vite dev server (HMR 有効)
     win.loadURL("http://localhost:5173");
     win.webContents.openDevTools();
   } else {
-    // ビルド済み React assets を file:// でロード
     win.loadFile(path.join(__dirname, "../../client/dist/index.html"));
   }
 
   return win;
 }
 
-app.whenReady().then(() => {
-  createWindow();
+app.whenReady().then(async () => {
+  try {
+    console.log("[Main] サーバーを起動中...");
+    await startServer(isDev);
+    console.log("[Main] サーバー起動完了");
+    createWindow();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    await dialog.showErrorBox("起動エラー", `サーバーの起動に失敗しました:\n${msg}`);
+    app.quit();
+  }
+});
+
+app.on("before-quit", () => {
+  stopServer();
 });
 
 app.on("window-all-closed", () => {
