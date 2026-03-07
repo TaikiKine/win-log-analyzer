@@ -1,0 +1,32 @@
+{
+  "name": "win-log-analyzer-server",
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "daemon:start": "pm2 start ecosystem.config.cjs",
+    "daemon:stop": "pm2 stop win-log-analyzer",
+    "daemon:restart": "pm2 restart win-log-analyzer",
+    "daemon:delete": "pm2 delete win-log-analyzer",
+    "daemon:logs": "pm2 logs win-log-analyzer",
+    "daemon:status": "pm2 status",
+    "daemon:save": "pm2 save",
+    "daemon:startup": "pm2 startup"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@hono/node-server": "^1.13.0",
+    "@types/node-cron": "^3.0.11",
+    "better-sqlite3": "^11.10.0",
+    "hono": "^4.6.0",
+    "node-cron": "^4.2.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

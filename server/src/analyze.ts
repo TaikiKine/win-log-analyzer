@@ -32,7 +32,7 @@ export async function analyzeLogs(logsText: string): Promise<AnalysisReport> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     throw new Error(
-      "ANTHROPIC_API_KEY が設定されていません。.env ファイルを確認してください。"
+      "ANTHROPIC_API_KEY が設定されていません。.env ファイルを確認してください。",
     );
   }
 

@@ -1,0 +1,33 @@
+# win-log-analyzer systemd ユニットファイル
+#
+# セットアップ手順:
+#   1. パスを環境に合わせて編集（User, WorkingDirectory, ExecStart）
+#   2. sudo cp win-log-analyzer.service /etc/systemd/system/
+#   3. sudo systemctl daemon-reload
+#   4. sudo systemctl enable win-log-analyzer
+#   5. sudo systemctl start win-log-analyzer
+#
+# ステータス確認:
+#   systemctl status win-log-analyzer
+#   journalctl -u win-log-analyzer -f
+
+[Unit]
+Description=Win Log Analyzer Server
+After=network.target
+
+[Service]
+Type=simple
+User=taiki
+WorkingDirectory=/home/taiki/projects/win-log-analyzer/server
+ExecStart=/home/taiki/.nvm/versions/node/v24.13.0/bin/node \
+  /home/taiki/projects/win-log-analyzer/server/node_modules/.bin/tsx \
+  src/index.ts
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+Environment=NODE_ENV=production
+Environment=PORT=3001
+
+[Install]
+WantedBy=default.target
