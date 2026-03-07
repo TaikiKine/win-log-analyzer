@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import http from "node:http";
 import path from "node:path";
+import { EventEmitter } from "node:events";
 import type { ChildProcess } from "node:child_process";
 
 // electron/dist/ から見たルートディレクトリ
@@ -15,6 +16,17 @@ const tsxBin = path.join(
   "node_modules/.bin",
   process.platform === "win32" ? "tsx.cmd" : "tsx",
 );
+
+/** サーバーの起動・停止を通知する EventEmitter */
+class ServerEventEmitter extends EventEmitter {
+  emit(event: "status-change", running: boolean): boolean {
+    return super.emit(event, running);
+  }
+  on(event: "status-change", listener: (running: boolean) => void): this {
+    return super.on(event, listener);
+  }
+}
+export const serverEvents = new ServerEventEmitter();
 
 let serverProcess: ChildProcess | null = null;
 
@@ -77,9 +89,12 @@ export function startServer(isDev: boolean): Promise<void> {
   serverProcess.on("exit", (code) => {
     console.log(`[Server] exited with code ${code}`);
     serverProcess = null;
+    serverEvents.emit("status-change", false);
   });
 
-  return waitForServer();
+  return waitForServer().then(() => {
+    serverEvents.emit("status-change", true);
+  });
 }
 
 /** サーバー子プロセスを停止する。 */
@@ -87,6 +102,7 @@ export function stopServer(): void {
   if (serverProcess) {
     serverProcess.kill();
     serverProcess = null;
+    serverEvents.emit("status-change", false);
   }
 }
 

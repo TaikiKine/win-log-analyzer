@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAnalyze } from "./useAnalyze";
 import { Report } from "./Report";
 import { HistoryView } from "./HistoryView";
@@ -19,6 +19,14 @@ type Tab = "analyze" | "history" | "diff" | "schedule";
 
 export function App() {
   const [tab, setTab] = useState<Tab>("analyze");
+  // Electron 環境でのみ有効。ブラウザ直アクセス時は null のまま（表示しない）
+  const [serverRunning, setServerRunning] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!window.electronAPI) return;
+    const unsubscribe = window.electronAPI.onServerStatusChange(setServerRunning);
+    return unsubscribe;
+  }, []);
   const [logName, setLogName] = useState("System");
   const [maxEvents, setMaxEvents] = useState(50);
   const [level, setLevel] = useState<LogLevel | "">("");
@@ -38,6 +46,11 @@ export function App() {
       <header className="header">
         <h1>win-log-analyzer</h1>
         <span className="subtitle">v0.3.0</span>
+        {serverRunning !== null && (
+          <span className={`server-badge ${serverRunning ? "running" : "stopped"}`}>
+            {serverRunning ? "● server" : "○ server stopped"}
+          </span>
+        )}
       </header>
 
       <div className="tabs">

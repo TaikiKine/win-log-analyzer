@@ -1,7 +1,7 @@
 import { app, BrowserWindow, dialog } from "electron";
 import path from "node:path";
-import { startServer, stopServer } from "./server-process";
-import { initTray, destroyTray } from "./tray";
+import { startServer, stopServer, serverEvents } from "./server-process";
+import { initTray, destroyTray, refreshTray } from "./tray";
 import { restoreWindowBounds, saveWindowBounds } from "./window-state";
 
 const isDev = !app.isPackaged;
@@ -50,6 +50,14 @@ app.whenReady().then(async () => {
 
     const win = createWindow();
     initTray(win);
+
+    // サーバーの状態変化をレンダラーへ転送し、トレイも同期する
+    serverEvents.on("status-change", (running) => {
+      if (!win.isDestroyed()) {
+        win.webContents.send("server-status", running);
+      }
+      refreshTray(win);
+    });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     await dialog.showErrorBox("起動エラー", `サーバーの起動に失敗しました:\n${msg}`);

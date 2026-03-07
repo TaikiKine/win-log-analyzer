@@ -84,6 +84,27 @@ body {
   font-family: var(--font-mono);
 }
 
+.server-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+  margin-left: auto;
+}
+
+.server-badge.running {
+  color: var(--accent-green);
+  border-color: var(--accent-green);
+  background: var(--accent-green-dim);
+}
+
+.server-badge.stopped {
+  color: var(--accent-red);
+  border-color: var(--accent-red);
+  background: var(--accent-red-dim);
+}
+
 /* ---- Controls ---- */
 .controls {
   display: flex;
