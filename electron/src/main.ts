@@ -1,6 +1,7 @@
 import { app, BrowserWindow, dialog } from "electron";
 import path from "node:path";
 import { startServer, stopServer } from "./server-process";
+import { initTray, destroyTray } from "./tray";
 
 const isDev = !app.isPackaged;
 
@@ -22,15 +23,28 @@ function createWindow(): BrowserWindow {
     win.loadFile(path.join(__dirname, "../../client/dist/index.html"));
   }
 
+  // ×ボタンで閉じてもウィンドウを非表示にするだけ（終了しない）
+  win.on("close", (e) => {
+    if (!isQuitting) {
+      e.preventDefault();
+      win.hide();
+    }
+  });
+
   return win;
 }
+
+// トレイの「終了」または before-quit で true にする
+let isQuitting = false;
 
 app.whenReady().then(async () => {
   try {
     console.log("[Main] サーバーを起動中...");
     await startServer(isDev);
     console.log("[Main] サーバー起動完了");
-    createWindow();
+
+    const win = createWindow();
+    initTray(win);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     await dialog.showErrorBox("起動エラー", `サーバーの起動に失敗しました:\n${msg}`);
@@ -39,9 +53,12 @@ app.whenReady().then(async () => {
 });
 
 app.on("before-quit", () => {
+  isQuitting = true;
+  destroyTray();
   stopServer();
 });
 
+// macOS 以外はウィンドウを全て閉じても終了しない（トレイ常駐）
 app.on("window-all-closed", () => {
-  app.quit();
+  if (process.platform === "darwin") app.quit();
 });
