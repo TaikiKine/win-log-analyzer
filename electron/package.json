@@ -1,0 +1,14 @@
+{
+  "name": "win-log-analyzer-electron",
+  "version": "0.3.0",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "tsc && electron .",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "electron": "^33.0.0",
+    "typescript": "^5.7.0"
+  }
+}
