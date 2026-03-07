@@ -2,6 +2,7 @@ import { app, BrowserWindow, dialog } from "electron";
 import path from "node:path";
 import { startServer, stopServer } from "./server-process";
 import { initTray, destroyTray } from "./tray";
+import { restoreWindowBounds, saveWindowBounds } from "./window-state";
 
 const isDev = !app.isPackaged;
 
@@ -16,6 +17,9 @@ function createWindow(): BrowserWindow {
     },
   });
 
+  // app.whenReady() 後に呼ばれるので screen API が使える
+  restoreWindowBounds(win);
+
   if (isDev) {
     win.loadURL("http://localhost:5173");
     win.webContents.openDevTools();
@@ -27,6 +31,7 @@ function createWindow(): BrowserWindow {
   win.on("close", (e) => {
     if (!isQuitting) {
       e.preventDefault();
+      saveWindowBounds(win);
       win.hide();
     }
   });

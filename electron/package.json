@@ -10,5 +10,8 @@
     "@types/node": "^22.0.0",
     "electron": "^33.0.0",
     "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
   }
 }
