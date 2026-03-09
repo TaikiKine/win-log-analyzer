@@ -61,7 +61,7 @@ export function saveReport(params: {
       params.fetchedAt,
     );
 
-  return getReportById(result.lastInsertRowid as number)!;
+  return getReportById(Number(result.lastInsertRowid))!;
 }
 
 export function listReports(limit = 50): ReportSummary[] {
@@ -130,7 +130,7 @@ export function createSchedule(params: {
       params.cronExpr,
       createdAt,
     );
-  return getScheduleById(result.lastInsertRowid as number)!;
+  return getScheduleById(Number(result.lastInsertRowid))!;
 }
 
 export function setScheduleEnabled(
@@ -155,7 +155,7 @@ export function deleteSchedule(id: number): boolean {
   const result = db
     .prepare(`DELETE FROM schedules WHERE id = ?`)
     .run(id);
-  return result.changes > 0;
+  return Number(result.changes) > 0;
 }
 
 function getScheduleById(id: number): ScheduleRecord | null {
