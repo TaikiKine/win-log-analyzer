@@ -27,11 +27,12 @@ let serverProcess: ProcessHandle | null = null;
 
 function getDevPaths() {
   // electron/dist/main.js → ../../ = root/
-  const rootDir = path.join(__dirname, "../..");
+  const serverDir = path.join(__dirname, "../../server");
   return {
-    cwd: path.join(rootDir, "server"),
+    cwd: serverDir,
+    // tsx は server ワークスペース内に留まる（root へ hoist されない）
     cmd: path.join(
-      rootDir,
+      serverDir,
       "node_modules/.bin",
       process.platform === "win32" ? "tsx.cmd" : "tsx",
     ),
