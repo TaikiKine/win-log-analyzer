@@ -24,7 +24,8 @@ function createWindow(): BrowserWindow {
     win.loadURL("http://localhost:5173");
     win.webContents.openDevTools();
   } else {
-    win.loadFile(path.join(__dirname, "../../client/dist/index.html"));
+    // prod: extraResources で process.resourcesPath/client/dist/ に配置される
+    win.loadFile(path.join(process.resourcesPath, "client/dist/index.html"));
   }
 
   // ×ボタンで閉じてもウィンドウを非表示にするだけ（終了しない）

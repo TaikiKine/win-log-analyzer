@@ -1,0 +1,59 @@
+appId: com.win-log-analyzer
+productName: Win Log Analyzer
+copyright: Copyright 2026
+
+directories:
+  # electron/ から見た相対パス
+  output: ../../dist/packages
+  buildResources: assets
+
+# Electron メインプロセスのエントリポイント
+main: dist/main.js
+
+# asar に含める Electron 本体のファイル
+files:
+  - dist/**/*
+  - assets/**/*
+  - "!dist/**/*.map"
+
+# asar 外のリソース（process.resourcesPath で参照）
+extraResources:
+  # ビルド済み React
+  - from: "../client/dist"
+    to: client/dist
+    filter: ["**/*", "!**/*.map"]
+  # コンパイル済み Hono サーバー
+  - from: "../server/dist"
+    to: server/dist
+    filter: ["**/*"]
+  # サーバーの依存モジュール（better-sqlite3 などのネイティブモジュールを含む）
+  - from: "../server/node_modules"
+    to: server/node_modules
+    filter:
+      - "**/*"
+      - "!**/*.md"
+      - "!**/*.map"
+      - "!**/test/**"
+      - "!**/tests/**"
+      - "!**/.npmignore"
+
+win:
+  # electron-builder が PNG → ICO に変換する
+  icon: assets/icon.png
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: false
+  createStartMenuShortcut: true
+  shortcutName: Win Log Analyzer
+
+# ネイティブモジュール（.node）は asar 外に展開
+asarUnpack:
+  - "**/*.node"
+  - "**/node_modules/better-sqlite3/**"

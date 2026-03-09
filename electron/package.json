@@ -7,8 +7,10 @@
     "build": "tsc"
   },
   "devDependencies": {
+    "@electron/rebuild": "^4.0.3",
     "@types/node": "^22.0.0",
     "electron": "^33.0.0",
+    "electron-builder": "^26.8.1",
     "typescript": "^5.7.0"
   },
   "dependencies": {

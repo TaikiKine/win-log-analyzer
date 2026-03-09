@@ -10,6 +10,15 @@
   "scripts": {
     "dev:server": "npm run dev -w server",
     "dev:client": "npm run dev -w client",
-    "dev:electron": "npm run dev -w electron"
+    "dev:electron": "npm run dev -w electron",
+
+    "build:client": "npm run build -w client",
+    "build:server": "npm run build -w server",
+    "build:electron": "npm run build -w electron",
+
+    "rebuild:native": "electron-rebuild -f -w better-sqlite3 --module-dir server",
+
+    "build": "npm run build:client && npm run build:server && npm run build:electron",
+    "package:win": "npm run build && npm run rebuild:native && electron-builder --config electron/electron-builder.yml --projectDir electron --win"
   }
 }
