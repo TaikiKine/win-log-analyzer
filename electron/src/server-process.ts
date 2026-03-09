@@ -89,7 +89,11 @@ function waitForServer(maxAttempts = 30, intervalMs = 500): Promise<void> {
 
 function spawnDev(): ProcessHandle {
   const { cwd, cmd, args } = getDevPaths();
-  const proc: ChildProcess = spawn(cmd, args, { cwd });
+  // Windows では .cmd ファイルを直接 spawn できないため shell: true が必要
+  const proc: ChildProcess = spawn(cmd, args, {
+    cwd,
+    shell: process.platform === "win32",
+  });
 
   proc.stdout?.on("data", (d: Buffer) => process.stdout.write(`[Server] ${d}`));
   proc.stderr?.on("data", (d: Buffer) => process.stderr.write(`[Server] ${d}`));
