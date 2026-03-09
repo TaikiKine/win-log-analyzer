@@ -10,6 +10,9 @@ function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
     width: 960,
     height: 700,
+    show: false,
+    title: "Win Log Analyzer",
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -17,12 +20,13 @@ function createWindow(): BrowserWindow {
     },
   });
 
+  win.once("ready-to-show", () => win.show());
+
   // app.whenReady() 後に呼ばれるので screen API が使える
   restoreWindowBounds(win);
 
   if (isDev) {
     win.loadURL("http://localhost:5173");
-    win.webContents.openDevTools();
   } else {
     // prod: extraResources で process.resourcesPath/client/dist/ に配置される
     win.loadFile(path.join(process.resourcesPath, "client/dist/index.html"));
