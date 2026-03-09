@@ -8,6 +8,8 @@ declare global {
   interface Window {
     electronAPI?: {
       onServerStatusChange: (callback: (running: boolean) => void) => () => void;
+      getApiKey: () => Promise<string | null>;
+      setApiKey: (plaintext: string) => Promise<void>;
     };
   }
 }

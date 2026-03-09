@@ -1,8 +1,8 @@
-import { app, BrowserWindow, dialog } from "electron";
+import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import path from "node:path";
 import { startServer, stopServer, serverEvents } from "./server-process";
 import { initTray, destroyTray, refreshTray } from "./tray";
-import { restoreWindowBounds, saveWindowBounds } from "./window-state";
+import { restoreWindowBounds, saveWindowBounds, getApiKey, setApiKey } from "./window-state";
 
 const isDev = !app.isPackaged;
 
@@ -47,10 +47,14 @@ function createWindow(): BrowserWindow {
 // トレイの「終了」または before-quit で true にする
 let isQuitting = false;
 
+// IPC: APIキーの取得・保存
+ipcMain.handle("get-api-key", () => getApiKey());
+ipcMain.handle("set-api-key", (_e, plaintext: string) => setApiKey(plaintext));
+
 app.whenReady().then(async () => {
   try {
     console.log("[Main] サーバーを起動中...");
-    await startServer(isDev);
+    await startServer(isDev, getApiKey());
     console.log("[Main] サーバー起動完了");
 
     const win = createWindow();

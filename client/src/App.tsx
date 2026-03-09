@@ -4,6 +4,7 @@ import { Report } from "./Report";
 import { HistoryView } from "./HistoryView";
 import { ScheduleView } from "./ScheduleView";
 import { DiffView } from "./DiffView";
+import { SettingsView } from "./SettingsView";
 import type { LogLevel } from "./types";
 
 const LOG_NAMES = ["System", "Application", "Security"] as const;
@@ -15,7 +16,7 @@ const LOG_LEVELS: Array<{ value: LogLevel | ""; label: string }> = [
   { value: "Information", label: "Information" },
 ];
 
-type Tab = "analyze" | "history" | "diff" | "schedule";
+type Tab = "analyze" | "history" | "diff" | "schedule" | "settings";
 
 export function App() {
   const [tab, setTab] = useState<Tab>("analyze");
@@ -78,6 +79,14 @@ export function App() {
         >
           スケジュール
         </button>
+        {window.electronAPI && (
+          <button
+            className={`tab ${tab === "settings" ? "active" : ""}`}
+            onClick={() => setTab("settings")}
+          >
+            設定
+          </button>
+        )}
       </div>
 
       {tab === "analyze" && (
@@ -159,6 +168,8 @@ export function App() {
       {tab === "diff" && <DiffView />}
 
       {tab === "schedule" && <ScheduleView />}
+
+      {tab === "settings" && <SettingsView />}
     </div>
   );
 }

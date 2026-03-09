@@ -862,3 +862,63 @@ body {
   text-decoration: line-through;
   color: var(--text-muted);
 }
+
+/* ---- Settings ---- */
+.settings-view {
+  padding: 24px;
+  max-width: 560px;
+}
+
+.settings-view h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.settings-section h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.settings-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.settings-row {
+  display: flex;
+  gap: 8px;
+}
+
+.api-key-input {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.85rem;
+  padding: 6px 10px;
+}
+
+.api-key-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.btn-save {
+  background: var(--accent-blue);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 6px 16px;
+  white-space: nowrap;
+}
+
+.btn-save:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

@@ -87,12 +87,16 @@ function waitForServer(maxAttempts = 30, intervalMs = 500): Promise<void> {
 
 // ---- プロセス起動 ----
 
-function spawnDev(): ProcessHandle {
+function spawnDev(apiKey: string | null): ProcessHandle {
   const { cwd, cmd, args } = getDevPaths();
   // Windows では .cmd ファイルを直接 spawn できないため shell: true が必要
   const proc: ChildProcess = spawn(cmd, args, {
     cwd,
     shell: process.platform === "win32",
+    env: {
+      ...process.env,
+      ...(apiKey ? { ANTHROPIC_API_KEY: apiKey } : {}),
+    },
   });
 
   proc.stdout?.on("data", (d: Buffer) => process.stdout.write(`[Server] ${d}`));
@@ -106,7 +110,7 @@ function spawnDev(): ProcessHandle {
   return proc;
 }
 
-function spawnProd(): ProcessHandle {
+function spawnProd(apiKey: string | null): ProcessHandle {
   const { serverDir, scriptPath } = getProdPaths();
 
   const proc = utilityProcess.fork(scriptPath, [], {
@@ -115,6 +119,7 @@ function spawnProd(): ProcessHandle {
     env: {
       ...process.env,
       NODE_PATH: path.join(serverDir, "node_modules"),
+      ...(apiKey ? { ANTHROPIC_API_KEY: apiKey } : {}),
     },
   });
 
@@ -131,10 +136,10 @@ function spawnProd(): ProcessHandle {
 
 // ---- 公開 API ----
 
-export async function startServer(isDev: boolean): Promise<void> {
+export async function startServer(isDev: boolean, apiKey: string | null = null): Promise<void> {
   if (serverProcess) return;
 
-  serverProcess = isDev ? spawnDev() : spawnProd();
+  serverProcess = isDev ? spawnDev(apiKey) : spawnProd(apiKey);
 
   return waitForServer().then(() => {
     serverEvents.emit("status-change", true);

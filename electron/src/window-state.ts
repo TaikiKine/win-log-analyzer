@@ -1,10 +1,11 @@
 import Store from "electron-store";
-import { screen } from "electron";
+import { screen, safeStorage } from "electron";
 import type { BrowserWindow, Rectangle } from "electron";
 
-// 将来: anthropicApiKey など設定項目をここに追加していく
 interface AppStore {
   windowBounds: Partial<Rectangle> & { width: number; height: number };
+  /** safeStorage で暗号化した APIキー (Base64) */
+  apiKeyEncrypted?: string;
 }
 
 const store = new Store<AppStore>({
@@ -12,6 +13,27 @@ const store = new Store<AppStore>({
     windowBounds: { width: 960, height: 700 },
   },
 });
+
+/** APIキーを safeStorage で暗号化して保存する */
+export function setApiKey(plaintext: string): void {
+  if (!plaintext) {
+    store.delete("apiKeyEncrypted");
+    return;
+  }
+  const encrypted = safeStorage.encryptString(plaintext);
+  store.set("apiKeyEncrypted", encrypted.toString("base64"));
+}
+
+/** 保存された APIキーを復号して返す。未設定なら null */
+export function getApiKey(): string | null {
+  const b64 = store.get("apiKeyEncrypted");
+  if (!b64) return null;
+  try {
+    return safeStorage.decryptString(Buffer.from(b64, "base64"));
+  } catch {
+    return null;
+  }
+}
 
 /** 保存された座標が現在の画面領域内に収まっているか確認する */
 function isWithinDisplays(bounds: Rectangle): boolean {
