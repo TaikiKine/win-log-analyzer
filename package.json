@@ -17,6 +17,6 @@
     "build:electron": "npm run build -w electron",
 
     "build": "npm run build:client && npm run build:server && npm run build:electron",
-    "package:win": "npm run build && electron-builder --config electron/electron-builder.yml --projectDir electron --win"
+    "package:win": "npm run build && electron-builder --config electron-builder.yml --projectDir electron --win"
   }
 }
