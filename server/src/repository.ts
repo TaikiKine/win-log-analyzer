@@ -67,14 +67,14 @@ export function saveReport(params: {
 export function listReports(limit = 50): ReportSummary[] {
   const rows = db
     .prepare(`SELECT * FROM reports ORDER BY fetched_at DESC LIMIT ?`)
-    .all(limit) as ReportRow[];
+    .all(limit) as unknown as ReportRow[];
   return rows.map(rowToSummary);
 }
 
 export function getReportById(id: number): StoredReport | null {
   const row = db
     .prepare(`SELECT * FROM reports WHERE id = ?`)
-    .get(id) as ReportRow | undefined;
+    .get(id) as unknown as ReportRow | undefined;
   return row ? rowToStoredReport(row) : null;
 }
 
@@ -107,7 +107,7 @@ function rowToSchedule(row: ScheduleRow): ScheduleRecord {
 export function listSchedules(): ScheduleRecord[] {
   const rows = db
     .prepare(`SELECT * FROM schedules ORDER BY created_at DESC`)
-    .all() as ScheduleRow[];
+    .all() as unknown as ScheduleRow[];
   return rows.map(rowToSchedule);
 }
 
@@ -161,6 +161,6 @@ export function deleteSchedule(id: number): boolean {
 function getScheduleById(id: number): ScheduleRecord | null {
   const row = db
     .prepare(`SELECT * FROM schedules WHERE id = ?`)
-    .get(id) as ScheduleRow | undefined;
+    .get(id) as unknown as ScheduleRow | undefined;
   return row ? rowToSchedule(row) : null;
 }
