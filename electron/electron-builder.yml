@@ -7,9 +7,6 @@ directories:
   output: ../../dist/packages
   buildResources: assets
 
-# Electron メインプロセスのエントリポイント
-main: dist/main.js
-
 # asar に含める Electron 本体のファイル
 files:
   - dist/**/*
