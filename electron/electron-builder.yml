@@ -1,6 +1,7 @@
 appId: com.win-log-analyzer
 productName: Win Log Analyzer
 copyright: Copyright 2026
+electronVersion: "40.8.0"
 
 directories:
   # electron/ から見た相対パス
