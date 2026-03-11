@@ -24,16 +24,6 @@ extraResources:
   - from: "../server/dist"
     to: server/dist
     filter: ["**/*"]
-  # サーバーの依存モジュール
-  - from: "../server/node_modules"
-    to: server/node_modules
-    filter:
-      - "**/*"
-      - "!**/*.md"
-      - "!**/*.map"
-      - "!**/test/**"
-      - "!**/tests/**"
-      - "!**/.npmignore"
 
 win:
   # electron-builder が PNG → ICO に変換する
