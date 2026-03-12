@@ -5,6 +5,7 @@ import type {
   DiffReport,
   AnalysisIssue,
 } from "./types";
+import { API_BASE } from "./api";
 
 const HEALTH_LABELS = {
   healthy: "正常",
@@ -23,7 +24,7 @@ export function DiffView() {
 
   const fetchList = useCallback(async () => {
     try {
-      const res = await fetch("/api/reports");
+      const res = await fetch(`${API_BASE}/api/reports`);
       const json: ApiResponse<ReportSummary[]> = await res.json();
       if (!json.ok || !json.data) throw new Error(json.error ?? "取得失敗");
       setReports(json.data);
@@ -48,7 +49,7 @@ export function DiffView() {
     setError(null);
     setDiff(null);
     try {
-      const res = await fetch(`/api/reports/diff/${id1}/${id2}`);
+      const res = await fetch(`${API_BASE}/api/reports/diff/${id1}/${id2}`);
       const json: ApiResponse<DiffReport> = await res.json();
       if (!json.ok || !json.data) throw new Error(json.error ?? "比較失敗");
       setDiff(json.data);

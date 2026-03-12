@@ -46,11 +46,11 @@ loadEnv(resolve(process.cwd(), ".env"));
 
 const app = new Hono();
 
-// CORS（dev 時は Vite の 5173 からアクセスされる）
+// CORS（dev: Vite 5173、prod: file:// は Origin: null として送られる）
 app.use(
   "/*",
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: ["http://localhost:5173", "http://localhost:3000", "null"],
   }),
 );
 

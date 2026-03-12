@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import type { ApiResponse, ScheduleRecord, LogLevel } from "./types";
+import { API_BASE } from "./api";
 
 const LOG_NAMES = ["System", "Application", "Security"] as const;
 const LOG_LEVELS: Array<{ value: LogLevel | ""; label: string }> = [
@@ -37,7 +38,7 @@ export function ScheduleView() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/schedules");
+      const res = await fetch(`${API_BASE}/api/schedules`);
       const json: ApiResponse<ScheduleRecord[]> = await res.json();
       if (!json.ok || !json.data) throw new Error(json.error ?? "取得失敗");
       setSchedules(json.data);
@@ -60,7 +61,7 @@ export function ScheduleView() {
     }
     setCreating(true);
     try {
-      const res = await fetch("/api/schedules", {
+      const res = await fetch(`${API_BASE}/api/schedules`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -83,7 +84,7 @@ export function ScheduleView() {
 
   const toggleEnabled = async (s: ScheduleRecord) => {
     try {
-      const res = await fetch(`/api/schedules/${s.id}`, {
+      const res = await fetch(`${API_BASE}/api/schedules/${s.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ enabled: !s.enabled }),
@@ -100,7 +101,7 @@ export function ScheduleView() {
 
   const handleDelete = async (id: number) => {
     try {
-      const res = await fetch(`/api/schedules/${id}`, { method: "DELETE" });
+      const res = await fetch(`${API_BASE}/api/schedules/${id}`, { method: "DELETE" });
       const json: ApiResponse<null> = await res.json();
       if (!json.ok) throw new Error(json.error ?? "削除失敗");
       setSchedules((prev) => prev.filter((s) => s.id !== id));

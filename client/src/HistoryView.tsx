@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { ApiResponse, ReportSummary, StoredReport } from "./types";
 import { Report } from "./Report";
+import { API_BASE } from "./api";
 
 const HEALTH_LABELS = {
   healthy: { label: "正常", cls: "healthy" },
@@ -21,7 +22,7 @@ export function HistoryView() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/reports");
+      const res = await fetch(`${API_BASE}/api/reports`);
       const json: ApiResponse<ReportSummary[]> = await res.json();
       if (!json.ok || !json.data) throw new Error(json.error ?? "取得失敗");
       setReports(json.data);
@@ -39,7 +40,7 @@ export function HistoryView() {
   const openDetail = async (id: number) => {
     setDetailLoading(true);
     try {
-      const res = await fetch(`/api/reports/${id}`);
+      const res = await fetch(`${API_BASE}/api/reports/${id}`);
       const json: ApiResponse<StoredReport> = await res.json();
       if (!json.ok || !json.data) throw new Error(json.error ?? "取得失敗");
       setSelectedReport(json.data);

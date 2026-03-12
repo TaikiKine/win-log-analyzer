@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import type { ApiResponse, AnalyzeResponse, LogLevel } from "./types";
+import { API_BASE } from "./api";
 
 interface AnalyzeParams {
   logName: string;
@@ -24,7 +25,7 @@ export function useAnalyze(): UseAnalyzeReturn {
     setError(null);
 
     try {
-      const res = await fetch("/api/analyze", {
+      const res = await fetch(`${API_BASE}/api/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(params),
