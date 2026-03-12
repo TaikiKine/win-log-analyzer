@@ -46,7 +46,7 @@ export function App() {
     <div className="app">
       <header className="header">
         <h1>win-log-analyzer</h1>
-        <span className="subtitle">v0.3.0</span>
+        <span className="subtitle">v1.0.0</span>
         {serverRunning !== null && (
           <span className={`server-badge ${serverRunning ? "running" : "stopped"}`}>
             {serverRunning ? "● server" : "○ server stopped"}

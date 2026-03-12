@@ -1,6 +1,6 @@
 {
   "name": "win-log-analyzer-electron",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Windows Event Log analyzer desktop app",
   "author": "taiki",
   "main": "dist/main.js",
