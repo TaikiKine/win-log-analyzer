@@ -1,12 +1,14 @@
 import type { ApiResponse } from "./types";
 
+const SERVER_PORT = 3001;
+
 /**
  * API のベース URL。
  * file:// で読み込まれる Electron prod 環境では絶対 URL が必要。
  * dev (Vite proxy) やブラウザ直アクセスでは相対パスのままでよい。
  */
 export const API_BASE =
-  location.protocol === "file:" ? "http://localhost:3001" : "";
+  location.protocol === "file:" ? `http://localhost:${SERVER_PORT}` : "";
 
 /**
  * fetch + JSON パース + ok チェックをまとめたヘルパー。

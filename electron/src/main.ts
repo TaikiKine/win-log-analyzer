@@ -47,11 +47,10 @@ function createWindow(): BrowserWindow {
 // トレイの「終了」または before-quit で true にする
 let isQuitting = false;
 
-// IPC: APIキーの取得・保存
-ipcMain.handle("get-api-key", () => getApiKey());
-ipcMain.handle("set-api-key", (_e, plaintext: string) => setApiKey(plaintext));
-
 app.whenReady().then(async () => {
+  // safeStorage は app.whenReady() 以降でのみ動作保証されるため IPC ハンドラをここで登録
+  ipcMain.handle("get-api-key", () => getApiKey());
+  ipcMain.handle("set-api-key", (_e, plaintext: string) => setApiKey(plaintext));
   try {
     console.log("[Main] サーバーを起動中...");
     await startServer(isDev, getApiKey());
