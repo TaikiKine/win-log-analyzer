@@ -1,11 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import type {
-  ApiResponse,
-  ReportSummary,
-  DiffReport,
-  AnalysisIssue,
-} from "./types";
-import { API_BASE } from "./api";
+import type { ReportSummary, DiffReport, AnalysisIssue } from "./types";
+import { apiFetch } from "./api";
 
 const HEALTH_LABELS = {
   healthy: "正常",
@@ -24,13 +19,11 @@ export function DiffView() {
 
   const fetchList = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/reports`);
-      const json: ApiResponse<ReportSummary[]> = await res.json();
-      if (!json.ok || !json.data) throw new Error(json.error ?? "取得失敗");
-      setReports(json.data);
-      if (json.data.length >= 2) {
-        setId1(String(json.data[1].id));
-        setId2(String(json.data[0].id));
+      const data = await apiFetch<ReportSummary[]>("/api/reports");
+      setReports(data);
+      if (data.length >= 2) {
+        setId1(String(data[1].id));
+        setId2(String(data[0].id));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "不明なエラー");
@@ -49,10 +42,8 @@ export function DiffView() {
     setError(null);
     setDiff(null);
     try {
-      const res = await fetch(`${API_BASE}/api/reports/diff/${id1}/${id2}`);
-      const json: ApiResponse<DiffReport> = await res.json();
-      if (!json.ok || !json.data) throw new Error(json.error ?? "比較失敗");
-      setDiff(json.data);
+      const data = await apiFetch<DiffReport>(`/api/reports/diff/${id1}/${id2}`);
+      setDiff(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "不明なエラー");
     } finally {

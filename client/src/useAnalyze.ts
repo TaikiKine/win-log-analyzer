@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
-import type { ApiResponse, AnalyzeResponse, LogLevel } from "./types";
-import { API_BASE } from "./api";
+import type { AnalyzeResponse, LogLevel } from "./types";
+import { apiFetch } from "./api";
 
 interface AnalyzeParams {
   logName: string;
@@ -25,19 +25,12 @@ export function useAnalyze(): UseAnalyzeReturn {
     setError(null);
 
     try {
-      const res = await fetch(`${API_BASE}/api/analyze`, {
+      const data = await apiFetch<AnalyzeResponse>("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(params),
       });
-
-      const json: ApiResponse<AnalyzeResponse> = await res.json();
-
-      if (!json.ok || !json.data) {
-        throw new Error(json.error ?? "分析に失敗しました");
-      }
-
-      setData(json.data);
+      setData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "不明なエラー");
     } finally {

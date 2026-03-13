@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import type { ApiResponse, ScheduleRecord, LogLevel } from "./types";
-import { API_BASE } from "./api";
+import type { ScheduleRecord, LogLevel } from "./types";
+import { apiFetch } from "./api";
 
 const LOG_NAMES = ["System", "Application", "Security"] as const;
 const LOG_LEVELS: Array<{ value: LogLevel | ""; label: string }> = [
@@ -38,10 +38,8 @@ export function ScheduleView() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/api/schedules`);
-      const json: ApiResponse<ScheduleRecord[]> = await res.json();
-      if (!json.ok || !json.data) throw new Error(json.error ?? "取得失敗");
-      setSchedules(json.data);
+      const data = await apiFetch<ScheduleRecord[]>("/api/schedules");
+      setSchedules(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "不明なエラー");
     } finally {
@@ -61,7 +59,7 @@ export function ScheduleView() {
     }
     setCreating(true);
     try {
-      const res = await fetch(`${API_BASE}/api/schedules`, {
+      const data = await apiFetch<ScheduleRecord>("/api/schedules", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -71,9 +69,7 @@ export function ScheduleView() {
           ...(level ? { level } : {}),
         }),
       });
-      const json: ApiResponse<ScheduleRecord> = await res.json();
-      if (!json.ok || !json.data) throw new Error(json.error ?? "作成失敗");
-      setSchedules((prev) => [json.data!, ...prev]);
+      setSchedules((prev) => [data, ...prev]);
       setCustomCron("");
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "不明なエラー");
@@ -84,16 +80,12 @@ export function ScheduleView() {
 
   const toggleEnabled = async (s: ScheduleRecord) => {
     try {
-      const res = await fetch(`${API_BASE}/api/schedules/${s.id}`, {
+      const data = await apiFetch<ScheduleRecord>(`/api/schedules/${s.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ enabled: !s.enabled }),
       });
-      const json: ApiResponse<ScheduleRecord> = await res.json();
-      if (!json.ok || !json.data) throw new Error(json.error ?? "更新失敗");
-      setSchedules((prev) =>
-        prev.map((x) => (x.id === s.id ? json.data! : x)),
-      );
+      setSchedules((prev) => prev.map((x) => (x.id === s.id ? data : x)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "不明なエラー");
     }
@@ -101,9 +93,7 @@ export function ScheduleView() {
 
   const handleDelete = async (id: number) => {
     try {
-      const res = await fetch(`${API_BASE}/api/schedules/${id}`, { method: "DELETE" });
-      const json: ApiResponse<null> = await res.json();
-      if (!json.ok) throw new Error(json.error ?? "削除失敗");
+      await apiFetch<null>(`/api/schedules/${id}`, { method: "DELETE" });
       setSchedules((prev) => prev.filter((s) => s.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "不明なエラー");

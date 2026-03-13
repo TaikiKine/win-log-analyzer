@@ -1,6 +1,7 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import type { Context } from "hono";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import cron from "node-cron";
@@ -43,6 +44,19 @@ function loadEnv(path: string): void {
 }
 
 loadEnv(resolve(process.cwd(), ".env"));
+
+// ---- ヘルパー ----
+
+/** パスパラメータを安全に number に変換する。不正なら null を返す */
+function parseId(raw: string): number | null {
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
+/** エラーレスポンスを返す */
+function fail(c: Context, message: string, status: 400 | 404 | 500 = 400) {
+  return c.json<ApiResponse<never>>({ ok: false, error: message }, status);
+}
 
 const app = new Hono();
 
@@ -117,25 +131,16 @@ app.get("/api/reports", (c) => {
 
 // 差分比較（:id より前に定義する必要がある）
 app.get("/api/reports/diff/:id1/:id2", (c) => {
-  const id1 = Number(c.req.param("id1"));
-  const id2 = Number(c.req.param("id2"));
+  const id1 = parseId(c.req.param("id1"));
+  const id2 = parseId(c.req.param("id2"));
 
-  if (!Number.isFinite(id1) || !Number.isFinite(id2)) {
-    return c.json<ApiResponse<never>>({ ok: false, error: "invalid id" }, 400);
-  }
-  if (id1 === id2) {
-    return c.json<ApiResponse<never>>(
-      { ok: false, error: "同じレポートは比較できません" },
-      400,
-    );
-  }
+  if (id1 === null || id2 === null) return fail(c, "invalid id");
+  if (id1 === id2) return fail(c, "同じレポートは比較できません");
 
   const r1 = getReportById(id1);
   const r2 = getReportById(id2);
 
-  if (!r1 || !r2) {
-    return c.json<ApiResponse<never>>({ ok: false, error: "not found" }, 404);
-  }
+  if (!r1 || !r2) return fail(c, "not found", 404);
 
   // id1 を旧、id2 を新として扱う（fetchedAt で自動判定）
   const [older, newer] =
@@ -147,14 +152,10 @@ app.get("/api/reports/diff/:id1/:id2", (c) => {
 
 // 履歴詳細
 app.get("/api/reports/:id", (c) => {
-  const id = Number(c.req.param("id"));
-  if (!Number.isFinite(id)) {
-    return c.json<ApiResponse<never>>({ ok: false, error: "invalid id" }, 400);
-  }
+  const id = parseId(c.req.param("id"));
+  if (id === null) return fail(c, "invalid id");
   const report = getReportById(id);
-  if (!report) {
-    return c.json<ApiResponse<never>>({ ok: false, error: "not found" }, 404);
-  }
+  if (!report) return fail(c, "not found", 404);
   return c.json<ApiResponse<StoredReport>>({ ok: true, data: report });
 });
 
@@ -200,16 +201,12 @@ app.post("/api/schedules", async (c) => {
 
 // スケジュール有効/無効切替
 app.patch("/api/schedules/:id", async (c) => {
-  const id = Number(c.req.param("id"));
-  if (!Number.isFinite(id)) {
-    return c.json<ApiResponse<never>>({ ok: false, error: "invalid id" }, 400);
-  }
+  const id = parseId(c.req.param("id"));
+  if (id === null) return fail(c, "invalid id");
 
   const body = await c.req.json<{ enabled: boolean }>().catch(() => ({ enabled: false }));
   const schedule = setScheduleEnabled(id, body.enabled);
-  if (!schedule) {
-    return c.json<ApiResponse<never>>({ ok: false, error: "not found" }, 404);
-  }
+  if (!schedule) return fail(c, "not found", 404);
 
   if (body.enabled) {
     startSchedule(schedule);
@@ -222,14 +219,10 @@ app.patch("/api/schedules/:id", async (c) => {
 
 // スケジュール削除
 app.delete("/api/schedules/:id", (c) => {
-  const id = Number(c.req.param("id"));
-  if (!Number.isFinite(id)) {
-    return c.json<ApiResponse<never>>({ ok: false, error: "invalid id" }, 400);
-  }
+  const id = parseId(c.req.param("id"));
+  if (id === null) return fail(c, "invalid id");
   const deleted = deleteSchedule(id);
-  if (!deleted) {
-    return c.json<ApiResponse<never>>({ ok: false, error: "not found" }, 404);
-  }
+  if (!deleted) return fail(c, "not found", 404);
   stopSchedule(id);
   return c.json<ApiResponse<null>>({ ok: true, data: null });
 });
