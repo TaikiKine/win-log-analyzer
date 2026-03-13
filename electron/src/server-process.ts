@@ -5,6 +5,10 @@ import { EventEmitter } from "node:events";
 import { utilityProcess } from "electron";
 import type { ChildProcess } from "node:child_process";
 
+const SERVER_PORT = 3001;
+const WAIT_MAX_ATTEMPTS = 30;
+const WAIT_INTERVAL_MS = 500;
+
 /** サーバーの起動・停止を通知する EventEmitter */
 class ServerEventEmitter extends EventEmitter {
   emit(event: "status-change", running: boolean): boolean {
@@ -51,12 +55,15 @@ function getProdPaths() {
 
 // ---- ヘルスチェック ----
 
-function waitForServer(maxAttempts = 30, intervalMs = 500): Promise<void> {
+function waitForServer(
+  maxAttempts = WAIT_MAX_ATTEMPTS,
+  intervalMs = WAIT_INTERVAL_MS,
+): Promise<void> {
   return new Promise((resolve, reject) => {
     let attempts = 0;
 
     const tryConnect = () => {
-      const req = http.get("http://localhost:3001/api/health", (res) => {
+      const req = http.get(`http://localhost:${SERVER_PORT}/api/health`, (res) => {
         res.resume();
         if (res.statusCode === 200) {
           resolve();

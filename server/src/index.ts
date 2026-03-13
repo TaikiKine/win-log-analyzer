@@ -60,7 +60,10 @@ function fail(c: Context, message: string, status: 400 | 404 | 500 = 400) {
 
 const app = new Hono();
 
-// CORS（dev: Vite 5173、prod: file:// は Origin: null として送られる）
+// CORS:
+//   dev  → Vite dev server (localhost:5173)
+//   prod → Electron が file:// でロードするため Origin ヘッダーが文字列 "null" になる
+//   ※ "null" は localhost バインドのみのサーバーで安全。外部公開時は削除すること
 app.use(
   "/*",
   cors({
